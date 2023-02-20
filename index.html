@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Whatsapp Helper</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <body>
+      <div class="container" style="padding-top: 50px">
+        <div class="row" style="margin-bottom:20px">
+          <div class="input-group">
+            <div class="form-floating col">
+              <input
+                type="text"
+                class="form-control"
+                id="phoneNumber"
+                name="phoneNumber"
+                placeholder="8612345678901"
+              />
+              <label for="phoneNumber">Telephone</label>
+            </div>
+            <button
+              id="paste"
+              type="button"
+              class="btn btn-light btn-outline-secondary"
+            >
+              Paste
+            </button>
+          </div>
+        </div>
+        <div class="d-grid">
+          <a id="callButton" type="button" class="btn btn-dark">Whatsapp</a>
+        </div>
+      </div>
+      <script>
+        // 获取input元素
+        const phoneNumberInput = document.getElementById("phoneNumber");
+        const callButton = document.getElementById("callButton");
+        const pastButton = document.getElementById("paste");
+
+        // 更新按钮链接属性的函数
+        function updateButtonLink() {
+          const link = `whatsapp://send/?phone=${normalizePhoneNumber(
+            phoneNumberInput.value
+          )}`;
+          callButton.setAttribute("href", link);
+        }
+
+        // 定义正则表达式来匹配电话号码
+        const phoneRegex = /^\s*(\+\d+)?\s*(\d{3,4})?\s*([-\s]?\d{7,8})\s*$/;
+        const normalizePhoneNumber = function (phoneNumber) {
+          if (phoneNumber.length === 8) {
+            return `852${phoneNumber}`;
+          }
+          if (phoneNumber.length === 11 && !phoneNumber.startsWith("852")) {
+            return `86${phoneNumber}`;
+          }
+          return phoneNumber;
+        };
+
+        // 定义一个函数来检查剪贴板中的内容是否符合电话号码格式
+        function checkClipboard() {
+          if (!navigator.clipboard) {
+            return;
+          }
+          navigator.clipboard.readText().then((text) => {
+            console.log(text);
+            if (phoneRegex.test(text)) {
+              const phoneNumber = normalizePhoneNumber(
+                text.replace(/[\s-\+]/g, "")
+              );
+              phoneNumberInput.value = phoneNumber;
+              console.log(phoneNumber);
+              const url = `whatsapp://send/?phone=${phoneNumber}`;
+              window.location.href = url;
+            }
+          });
+        }
+        // 监听input元素的输入事件
+        phoneNumberInput.addEventListener("input", () => {
+          updateButtonLink();
+        });
+        pastButton.addEventListener("click", () => {
+          checkClipboard();
+        });
+
+        // 初始化按钮链接属性
+        updateButtonLink();
+
+        // 添加一个 visibilitychange 事件监听器
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden) {
+            checkClipboard();
+          }
+        });
+
+        // 页面加载完成后自动检查剪贴板内容
+        window.addEventListener("load", () => {
+          checkClipboard();
+        });
+      </script>
+    </body>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-/mhDoLbDldZc3qpsJHpLogda//BVZbgYuw6kof4u2FrCedxOtgRZDTHgHUhOCVim"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
